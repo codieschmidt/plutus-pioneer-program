@@ -11,7 +11,7 @@ import {
     AddressDetails,
 } from "https://deno.land/x/lucid@0.10.7/mod.ts"
 // create a seed.ts file with your seed
-//TODO create seed file
+//TODO create 2 seed files
 import { secretSeed } from "./seed.ts"
 
 // set blockfrost endpoint
@@ -37,7 +37,6 @@ const vestingScript: SpendingValidator = {
 const vestingAddress: Address = lucid.utils.validatorToAddress(vestingScript);
 
 // Create the vesting datum type
-//TODO update new datum
 const VestingDatum = Data.Object({
     postDeadlineBeneficary: Data.String,
     preDeadlineBeneficary: Data.String, 
@@ -75,8 +74,7 @@ async function vestFunds(amount: bigint): Promise<TxHash> {
     return txHash
 }
 
-
-//TODO add second claim for second beneficiary
+//TODO add second claim fucntion for pre deadline beneficiary
 async function claimVestedFunds(): Promise<TxHash> {
     const dtm: Datum = Data.to<VestingDatum>(datum,VestingDatum);
     const utxoAtScript: UTxO[] = await lucid.utxosAt(vestingAddress);
