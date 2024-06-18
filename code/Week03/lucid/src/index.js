@@ -19,6 +19,7 @@ function removeChildren(elt) {
     }
 }
 
+//Creates a lucid object for later use. Runs on page initialization
 async function loadCardano() {
     const nami = window.cardano.nami;
     if (!nami) {
@@ -36,12 +37,15 @@ async function loadCardano() {
     }
 }
 
+//Submits a signed Cardano transaction, logs it, and add it to the table for viewing.
 async function submitCardanoTx(signedTx) {
     const tid = await signedTx.submit();
     console.log("Cardano tx submitted: " + tid);
     addLinkToTable("cardanoTxTable", "https://preview.cardanoscan.io/transaction/" + tid, tid);
 }
 
+//Calls sign on the transaction to launch the browser window. Then calls the submitCardanoTx funciton. 
+//Raises an alert iwth any exceptions generated for the user.
 async function signAndSubmitCardanoTx(tx) {
     try {
         const signedTx = await tx.sign().complete();
@@ -52,12 +56,14 @@ async function signAndSubmitCardanoTx(tx) {
     }
 }
 
+//Gets the public key has of the connected wallet
 async function getCardanoPKH() {
     const addr = await lucid.wallet.address();
     const details = await L.getAddressDetails(addr);
     return details.paymentCredential.hash;
 }
 
+//Gets the UTXOs for the current wallet
 async function getStatus() {
     const pkh = await getCardanoPKH();
     const utxos = await lucid.wallet.getUtxos();
