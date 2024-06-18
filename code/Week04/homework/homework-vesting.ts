@@ -9,7 +9,7 @@ import {
     UTxO,
     Address,
     AddressDetails,
-} from "https://deno.land/x/lucid@0.10.7/mod.ts"
+} from "https://deno.land/x/lucid@0.9.1/mod.ts"
 // create a seed.ts file with your seed
 //TODO create 2 seed files
 import { secretSeed } from "./seed.ts"

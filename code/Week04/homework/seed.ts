@@ -1,0 +1,1 @@
+export const secretSeed="life student hollow opinion flash siege paper friend hollow mention acoustic girl"
