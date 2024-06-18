@@ -39,7 +39,8 @@ const vestingAddress: Address = lucid.utils.validatorToAddress(vestingScript);
 // Create the vesting datum type
 //TODO update new datum
 const VestingDatum = Data.Object({
-    beneficiary: Data.String,
+    postDeadlineBeneficary: Data.String,
+    preDeadlineBeneficary: Data.String, 
     deadline: Data.BigInt,
 });
 type VestingDatum = Data.Static<typeof VestingDatum>;
@@ -49,13 +50,16 @@ const deadlineDate: Date = new Date("2023-03-19T00:00:00Z")
 const deadlinePosIx = BigInt(deadlineDate.getTime());
 
 // Set the vesting beneficiary to our own key.
-//#TODO add second beneficiary
-const details: AddressDetails = getAddressDetails(addr);
-const beneficiaryPKH: string = details.paymentCredential.hash
+const postDeadlineBeneficiaryDetails: AddressDetails = getAddressDetails(addr);
+const postDeadlineBeneficiaryPKH: string = postDeadlineBeneficiaryDetails.paymentCredential.hash
+
+const preDeadlineBeneficary: AddressDetails = getAddressDetails(addr);
+const preDeadlineBeneficiaryPKH: string = preDeadlineBeneficary.paymentCredential.hash
 
 // Creating a datum with a beneficiary and deadline
 const datum: VestingDatum = {
-    beneficiary: beneficiaryPKH,
+    postDeadlineBeneficary: postDeadlineBeneficiaryDetails,
+    preDeadlineBeneficary: preDeadlineBeneficiaryPKH,
     deadline: deadlinePosIx,
 };
 
@@ -82,7 +86,7 @@ async function claimVestedFunds(): Promise<TxHash> {
         const tx = await lucid
             .newTx()
             .collectFrom(ourUTxO, Data.void())
-            .addSignerKey(beneficiaryPKH)
+            .addSignerKey(postDeadlineBeneficiaryPKH)
             .attachSpendingValidator(vestingScript)
             .validFrom(Date.now()-100000)
             .complete();
