@@ -13,6 +13,7 @@ import {
 // create a seed.ts file with your seed
 //TODO create 2 seed files
 import { secretSeed } from "./seed.ts"
+import { secretSeed2 } from "./seed2.ts"
 
 // set blockfrost endpoint
 const lucid = await Lucid.new(
@@ -26,7 +27,12 @@ const lucid = await Lucid.new(
 // load local stored seed as a wallet into lucid
 lucid.selectWalletFromSeed(secretSeed);
 const addr: Address = await lucid.wallet.address();
-console.log(addr);
+console.log("Address 1: " + addr);
+
+// load local stored seed as a wallet into lucid
+lucid.selectWalletFromSeed(secretSeed2);
+const addr2: Address = await lucid.wallet.address();
+console.log("Address 2: " + addr2);
 
 // Define the vesting plutus script
 //TODO replace script

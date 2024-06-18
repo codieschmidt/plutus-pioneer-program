@@ -1,0 +1,1 @@
+export const secretSeed2="truck rose invest doll owner this list unknown glory business need mask"
