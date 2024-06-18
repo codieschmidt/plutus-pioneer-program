@@ -18,8 +18,7 @@ import { secretSeed } from "./seed.ts"
 const lucid = await Lucid.new(
   new Blockfrost(
     "https://cardano-preprod.blockfrost.io/api/v0",
-    //TODO get API key
-    "insert you own api key here"
+    "preprodN5IDBsioNNKutjNxqxSeYpddGpRkCXJX"
   ),
   "Preprod"
 );
