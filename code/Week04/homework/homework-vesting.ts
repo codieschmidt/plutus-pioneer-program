@@ -52,6 +52,7 @@ type VestingDatum = Data.Static<typeof VestingDatum>;
 
 // Set the vesting deadline
 const deadlineDate: Date = new Date("2023-03-19T00:00:00Z")
+//const deadlineDate: Date = new Date("2028-03-19T00:00:00Z")
 const deadlinePosIx = BigInt(deadlineDate.getTime());
 
 // Set the vesting beneficiary to our own key.
@@ -81,11 +82,13 @@ async function vestFunds(amount: bigint): Promise<TxHash> {
     return txHash
 }
 
-//TODO add second claim fucntion for pre deadline beneficiary
+//Retrieves funds for the postDeadlineBeneficiary
 async function claimVestedFundsAfterDeadline(): Promise<TxHash> {
     const dtm: Datum = Data.to<VestingDatum>(datum,VestingDatum);
     const utxoAtScript: UTxO[] = await lucid.utxosAt(vestingAddress);
-    const ourUTxO: UTxO[] = utxoAtScript.filter((utxo) => utxo.datum == dtm);
+    const ourUTxO: UTxO[] = utxoAtScript.filter((utxo) => utxo.txHash == "c9aab72ec1931377586a10b45a9be860cb3fe8199aea7e934e5338504bb0f570");
+
+    console.log(ourUTxO)
     
     if (ourUTxO && ourUTxO.length > 0) {
         const tx = await lucid
@@ -103,5 +106,27 @@ async function claimVestedFundsAfterDeadline(): Promise<TxHash> {
     else return "No UTxO's found that can be claimed"
 }
 
-console.log(await vestFunds(10000n));
-//console.log(await claimVestedFundsAfterDeadline());
+//Retrieves funds for the preDeadlineBeneficiary
+async function claimVestedFundsBeforeDeadline(): Promise<TxHash> {
+    const dtm: Datum = Data.to<VestingDatum>(datum,VestingDatum);
+    const utxoAtScript: UTxO[] = await lucid.utxosAt(vestingAddress);
+    const ourUTxO: UTxO[] = utxoAtScript.filter((utxo) => utxo.datum == dtm);
+    
+    if (ourUTxO && ourUTxO.length > 0) {
+        const tx = await lucid
+            .newTx()
+            .collectFrom(ourUTxO, Data.void())
+            .addSignerKey(preDeadlineBeneficiaryPKH)
+            .attachSpendingValidator(vestingScript)
+            .validTo(Date.now()+100000)
+            .complete();
+
+        const signedTx = await tx.sign().complete();
+        const txHash = await signedTx.submit();
+        return txHash
+    }
+    else return "No UTxO's found that can be claimed"
+}
+
+//console.log(await vestFunds(10000n));
+console.log(await claimVestedFundsAfterDeadline());
