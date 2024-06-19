@@ -1,1 +1,6 @@
+
+#install 
+curl -fsSL https://deno.land/install.sh | sh
+
+#run
 /config/.deno/bin/deno run homework-vesting.ts
