@@ -25,14 +25,14 @@ const lucid = await Lucid.new(
 );
 
 // load local stored seed as a wallet into lucid
-lucid.selectWalletFromSeed(secretSeed);
-const addr: Address = await lucid.wallet.address();
-console.log("Address 1: " + addr);
-
-// load local stored seed as a wallet into lucid
 lucid.selectWalletFromSeed(secretSeed2);
 const addr2: Address = await lucid.wallet.address();
 console.log("Address 2: " + addr2);
+
+// load local stored seed as a wallet into lucid
+lucid.selectWalletFromSeed(secretSeed);
+const addr: Address = await lucid.wallet.address();
+console.log("Address 1: " + addr);
 
 // Define the vesting plutus script
 //TODO replace script
@@ -44,8 +44,8 @@ const vestingAddress: Address = lucid.utils.validatorToAddress(vestingScript);
 
 // Create the vesting datum type
 const VestingDatum = Data.Object({
-    postDeadlineBeneficary: Data.String,
-    preDeadlineBeneficary: Data.String, 
+    preDeadlineBeneficary: Data.String,
+    postDeadlineBeneficary: Data.String, 
     deadline: Data.BigInt,
 });
 type VestingDatum = Data.Static<typeof VestingDatum>;
@@ -55,16 +55,17 @@ const deadlineDate: Date = new Date("2023-03-19T00:00:00Z")
 const deadlinePosIx = BigInt(deadlineDate.getTime());
 
 // Set the vesting beneficiary to our own key.
-const postDeadlineBeneficiaryDetails: AddressDetails = getAddressDetails(addr);
+const postDeadlineBeneficiaryDetails: AddressDetails = getAddressDetails(addr2);
 const postDeadlineBeneficiaryPKH: string = postDeadlineBeneficiaryDetails.paymentCredential.hash
 
+// set the second vesting beneficiary
 const preDeadlineBeneficary: AddressDetails = getAddressDetails(addr);
 const preDeadlineBeneficiaryPKH: string = preDeadlineBeneficary.paymentCredential.hash
 
 // Creating a datum with a beneficiary and deadline
 const datum: VestingDatum = {
-    postDeadlineBeneficary: postDeadlineBeneficiaryDetails,
     preDeadlineBeneficary: preDeadlineBeneficiaryPKH,
+    postDeadlineBeneficary: postDeadlineBeneficiaryPKH,
     deadline: deadlinePosIx,
 };
 
@@ -81,7 +82,7 @@ async function vestFunds(amount: bigint): Promise<TxHash> {
 }
 
 //TODO add second claim fucntion for pre deadline beneficiary
-async function claimVestedFunds(): Promise<TxHash> {
+async function claimVestedFundsAfterDeadline(): Promise<TxHash> {
     const dtm: Datum = Data.to<VestingDatum>(datum,VestingDatum);
     const utxoAtScript: UTxO[] = await lucid.utxosAt(vestingAddress);
     const ourUTxO: UTxO[] = utxoAtScript.filter((utxo) => utxo.datum == dtm);
@@ -102,5 +103,5 @@ async function claimVestedFunds(): Promise<TxHash> {
     else return "No UTxO's found that can be claimed"
 }
 
-//console.log(await vestFunds(100000000n));
-//console.log(await claimVestedFunds());
+console.log(await vestFunds(10000n));
+//console.log(await claimVestedFundsAfterDeadline());
